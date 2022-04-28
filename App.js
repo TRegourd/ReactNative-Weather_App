@@ -5,10 +5,11 @@ import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 
 export default function App() {
-  const API_key = "5b1df37e12349a8c845b6a52a7b374cc";
+  const API_key = "ec9fe52a2e0a6f6f1d61a6988a138b94";
   const [weatherData, setweatherData] = useState();
   const [text, onChangeText] = useState();
   const [inputCity, setInputCity] = useState("Chambery");
+  // const weatherLogoUri = `http://openweathermap.org/img/w/${weatherData?.weather[0]?.icon}.png`;
 
   async function fetchweatherData(city) {
     await fetch(
@@ -20,17 +21,13 @@ export default function App() {
       });
   }
 
-  const onPress = () => {
+  const onPressSearch = () => {
     setInputCity(text);
   };
 
-  fetchweatherData(inputCity);
-
-  // useEffect(() => {
-  //   fetchweatherData(inputCity);
-  // }, []);
-
-  const weatherLogoUri = `http://openweathermap.org/img/w/${weatherData?.weather[0]?.icon}.png`;
+  useEffect(() => {
+    fetchweatherData(inputCity);
+  }, [inputCity]);
 
   return (
     <View style={styles.container}>
@@ -42,7 +39,7 @@ export default function App() {
           onChangeText={onChangeText}
           value={text}
         />
-        <TouchableOpacity onPress={onPress}>
+        <TouchableOpacity onPress={onPressSearch}>
           <FontAwesome name="search" size={24} color="black" />
         </TouchableOpacity>
       </View>
@@ -53,7 +50,9 @@ export default function App() {
         </Text>
         <Image
           style={styles.weatherLogo}
-          source={{ uri: weatherLogoUri }}
+          source={{
+            uri: `http://openweathermap.org/img/w/${weatherData?.weather[0]?.icon}.png`,
+          }}
         ></Image>
         <Text style={styles.currentWeather}>
           {weatherData?.weather[0]?.main}
