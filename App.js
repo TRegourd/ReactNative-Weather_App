@@ -14,15 +14,19 @@ import { TouchableOpacity } from "react-native";
 import * as Location from "expo-location";
 import baseData from "./baseData.json";
 import dayjs from "dayjs";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
   const API_key = "5b1df37e12349a8c845b6a52a7b374cc";
-  const [weatherData, setweatherData] = useState(baseData);
+  const [weatherData, setweatherData] = useState();
   const [forecastData, setForecastData] = useState([]);
   const [text, onChangeText] = useState();
-  const [inputCity, setInputCity] = useState("Chambery");
+  const [inputCity, setInputCity] = useState();
   const [location, setLocation] = useState(null);
   // const weatherLogoUri = `http://openweathermap.org/img/w/${weatherData?.weather[0]?.icon}.png`;
+
+  // const localWeatherData = getWeatherData();
+  // console.log(localWeatherData);
 
   const requestPermissions = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -47,6 +51,57 @@ export default function App() {
         }
       });
   }
+
+  const storeWeatherData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("@weather", jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getWeatherData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("@weather");
+      console.log("JSON local", JSON.parse(jsonValue));
+      return jsonValue != null ? setweatherData(JSON.parse(jsonValue)) : null;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const storeForecastData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("@forecast", jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getForecastData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("@forecast");
+      console.log("JSON local", JSON.parse(jsonValue));
+      return jsonValue != null ? setForecastData(JSON.parse(jsonValue)) : null;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getWeatherData();
+    getForecastData();
+  }, []);
+
+  useEffect(() => {
+    storeWeatherData(weatherData);
+  }, [weatherData]);
+
+  useEffect(() => {
+    storeForecastData(forecastData);
+  }, [forecastData]);
 
   async function fetchForecastDataByLocation(location) {
     await fetch(
@@ -191,91 +246,103 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
+    borderWidth: 1,
   },
   inputContainer: {
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    borderWidth: 1,
   },
   weatherLogo: {
     width: 100,
     height: 100,
+    borderWidth: 1,
   },
   currentWeather: {
     margin: 10,
     fontSize: 20,
+    borderWidth: 1,
   },
   tempContainer: {
     //borderWidth: 1,
-    display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    borderWidth: 1,
   },
   tempMinMaxContainer: {
     //borderWidth: 1,
-    display: "flex",
     flexDirection: "row",
+    borderWidth: 1,
   },
   tempMinMax: {
     margin: 10,
     fontSize: 20,
+    borderWidth: 1,
   },
   currentTemp: {
     margin: 10,
     fontSize: 50,
+    borderWidth: 1,
   },
   city: {
     margin: 10,
     fontSize: 30,
+    borderWidth: 1,
   },
   windContainer: {
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    borderWidth: 1,
   },
   windText: {
     margin: 10,
+    borderWidth: 1,
   },
 
   forecastContainer: {
     margin: 10,
+    borderWidth: 1,
   },
 
   forecastScrollContainer: {
-    display: "flex",
     margin: 10,
     flexWrap: "wrap",
+    borderWidth: 1,
   },
 
   forecast: {
-    display: "flex",
     flexDirection: "column",
     alignItems: "center",
     margin: 5,
     borderRadius: 10,
     flexWrap: "wrap",
     backgroundColor: "#e9ecef",
+    borderWidth: 1,
   },
   forecastLogo: {
     width: 50,
     height: 50,
+    borderWidth: 1,
   },
   currentForecast: {
     margin: 10,
     fontSize: 10,
+    borderWidth: 1,
   },
   forecastMinMaxContainer: {
-    display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    borderWidth: 1,
   },
   forecastMinMax: {
     margin: 2,
     fontSize: 10,
+    borderWidth: 1,
   },
 
   forecastTitle: {
     paddingTop: 20,
     fontSize: 20,
+    borderWidth: 1,
   },
 });
