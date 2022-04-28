@@ -3,13 +3,12 @@ import { StyleSheet, Text, View, Image, TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
-
-import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-location";
+import baseData from "./baseData.json";
 
 export default function App() {
-  const API_key = "ec9fe52a2e0a6f6f1d61a6988a138b94";
-  const [weatherData, setweatherData] = useState();
+  const API_key = "bdb97645ce611289c0abb8c3f467c2ce";
+  const [weatherData, setweatherData] = useState(baseData);
   const [text, onChangeText] = useState();
   const [inputCity, setInputCity] = useState("Chambery");
   const [location, setLocation] = useState(null);
@@ -33,7 +32,9 @@ export default function App() {
     )
       .then((response) => response.json())
       .then((response) => {
-        setweatherData(response);
+        if (response.cod === 200) {
+          setweatherData(response);
+        }
       });
   }
 
@@ -43,7 +44,9 @@ export default function App() {
     )
       .then((response) => response.json())
       .then((response) => {
-        setweatherData(response);
+        if (response.cod === 200) {
+          setweatherData(response);
+        }
       });
   }
 
@@ -65,9 +68,7 @@ export default function App() {
 
       <View style={styles.inputContainer}>
         <TouchableOpacity onPress={requestPermissions}>
-          <Text>
-            <FontAwesome5 name="location-arrow" size={24} color="black" />
-          </Text>
+          <FontAwesome5 name="location-arrow" size={24} color="black" />
         </TouchableOpacity>
         <TextInput
           style={styles.input}
@@ -88,7 +89,7 @@ export default function App() {
           source={{
             uri: `http://openweathermap.org/img/w/${weatherData?.weather[0]?.icon}.png`,
           }}
-        ></Image>
+        />
         <Text style={styles.currentWeather}>
           {weatherData?.weather[0]?.main}
         </Text>
