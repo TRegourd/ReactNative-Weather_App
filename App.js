@@ -4,14 +4,40 @@ import { useState, useEffect } from "react";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 
+import * as TaskManager from "expo-task-manager";
+import * as Location from "expo-location";
+
 export default function App() {
   const API_key = "ec9fe52a2e0a6f6f1d61a6988a138b94";
   const [weatherData, setweatherData] = useState();
   const [text, onChangeText] = useState();
   const [inputCity, setInputCity] = useState("Chambery");
+  const [location, setLocation] = useState(null);
   // const weatherLogoUri = `http://openweathermap.org/img/w/${weatherData?.weather[0]?.icon}.png`;
 
-  async function fetchweatherData(city) {
+  const requestPermissions = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === "granted") {
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+      fetchweatherDataByLocation(location);
+    } else {
+      setErrorMsg("Permission to access location was denied");
+      return;
+    }
+  };
+
+  async function fetchweatherDataByLocation(location) {
+    await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${location?.coords.latitude}&lon=${location?.coords.longitude}&appid=${API_key}&units=metric`
+    )
+      .then((response) => response.json())
+      .then((response) => {
+        setweatherData(response);
+      });
+  }
+
+  async function fetchweatherDataByCity(city) {
     await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_key}&units=metric`
     )
@@ -26,7 +52,11 @@ export default function App() {
   };
 
   useEffect(() => {
-    fetchweatherData(inputCity);
+    fetchweatherDataByLocation(location);
+  }, [location]);
+
+  useEffect(() => {
+    fetchweatherDataByCity(inputCity);
   }, [inputCity]);
 
   return (
@@ -34,6 +64,11 @@ export default function App() {
       <StatusBar style="auto" />
 
       <View style={styles.inputContainer}>
+        <TouchableOpacity onPress={requestPermissions}>
+          <Text>
+            <FontAwesome5 name="location-arrow" size={24} color="black" />
+          </Text>
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           onChangeText={onChangeText}
