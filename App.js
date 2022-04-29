@@ -4,17 +4,17 @@ import {
   Text,
   View,
   Image,
-  TextInput,
   ScrollView,
   SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
+
 import * as Location from "expo-location";
-import baseData from "./baseData.json";
 import dayjs from "dayjs";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import BackgroundLogo from "./components/BackgroundLogo";
+import { Weather } from "./components/Weather";
+import { Input } from "./components/Input";
 
 export default function App() {
   const API_key = "5b1df37e12349a8c845b6a52a7b374cc";
@@ -159,50 +159,14 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
 
-      <View style={styles.inputContainer}>
-        <TouchableOpacity onPress={requestPermissions}>
-          <FontAwesome5 name="location-arrow" size={24} color="black" />
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeText}
-          value={text}
-        />
-        <TouchableOpacity onPress={onPressSearch}>
-          <FontAwesome name="search" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.weatherContainer}>
-        <Text style={styles.city}>{weatherData?.name}</Text>
-        <View style={styles.tempContainer}>
-          <Text style={styles.currentTemp}>
-            {Math.round(weatherData?.main?.temp)}°C
-          </Text>
-          <Image
-            style={styles.weatherLogo}
-            source={{
-              uri: `http://openweathermap.org/img/w/${weatherData?.weather[0]?.icon}.png`,
-            }}
-          />
-          <Text style={styles.currentWeather}>
-            {weatherData?.weather[0]?.main}
-          </Text>
-          <View style={styles.tempMinMaxContainer}>
-            <Text style={styles.tempMinMax}>
-              Min {Math.round(weatherData?.main?.temp_min)}°C
-            </Text>
-            <Text style={styles.tempMinMax}>
-              Max {Math.round(weatherData?.main?.temp_max)}°C
-            </Text>
-          </View>
-        </View>
-        <View style={styles.windContainer}>
-          <FontAwesome5 name="wind" size={24} color="black" />
-          <Text style={styles.windText}>
-            Wind speed : {Math.round(weatherData?.wind?.speed)} km/h
-          </Text>
-        </View>
-      </View>
+      {/* <BackgroundLogo></BackgroundLogo> */}
+      <Input
+        requestPermissions={requestPermissions}
+        onChangeText={onChangeText}
+        text={text}
+        onPressSearch={onPressSearch}
+      ></Input>
+      <Weather weatherData={weatherData}></Weather>
       <View style={styles.forecastContainer}>
         <Text style={styles.forecastTitle}>5 days forecast</Text>
         <ScrollView horizontal={true} style={styles.forecastScrollContainer}>
@@ -236,25 +200,12 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-  },
-  input: {
-    height: 40,
-    width: 200,
-    margin: 12,
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-  },
-  inputContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
   },
   weatherLogo: {
     width: 100,
